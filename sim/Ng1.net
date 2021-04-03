@@ -1,0 +1,23 @@
+*voltage divider netlist
+.options savecurrents
+
+
+.include ../doc/ngspice_1.tex
+
+.model P2model NPN(Bf=200, CJE=12pF, CJC=2pF)
+.control
+
+op
+
+echo "********************************************"
+echo  "Operating point"
+echo "********************************************"
+
+echo  "op_TAB"
+print all
+echo  "op_END"
+
+quit
+
+.endc
+.end

@@ -1,0 +1,24 @@
+
+.options savecurrents
+
+
+.include ../doc/ngspice_2.txt
+
+
+.control
+
+op
+
+echo "********************************************"
+echo  "Operating point 2"
+echo "********************************************"
+
+echo  "op_TAB2"
+print all
+echo  "op_END2"
+
+
+quit
+
+.endc 
+.end
