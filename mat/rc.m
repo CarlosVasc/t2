@@ -10,41 +10,41 @@ pkg load signal
 format longg
 %abertura do ficheiro
 fid=fopen("testi.txt","r");
-i=1;
+ll=1;
 while ~feof(fid)
      linha=fgetl(fid);
    if(linha)~=0 
-       if i>6 
+       if ll>6 
         [dado,resto]=strtok(linha," ");
         [lixo,valor]=strtok(resto," ");
-        d(i)=str2double(valor);
+        d(ll)=str2double(valor);
         
-       elseif i==6
+       elseif ll==6
         [dado,resto]=strtok(linha," R1 = ");
         [lixoaux,valoraux]=strtok(resto," ");  
         [lixo,valor]=strtok(valoraux," ");
-        d(i)=str2double(valor);
+        d(ll)=str2double(valor);
         
        end
    else 
-       d(i)=0; 
+       d(ll)=0; 
    end
    
-    i=i+1;
+    ll=ll+1;
 end
 fclose(fid);
 
-R1=d(6);
-R2=d(7);
-R3=d(8);
-R4=d(9);
-R5=d(10);
-R6=d(11);
-R7=d(12);
+R1=d(6)*1000;
+R2=d(7)*1000;
+R3=d(8)*1000;
+R4=d(9)*1000;
+R5=d(10)*1000;
+R6=d(11)*1000;
+R7=d(12)*1000;
 Vs=d(13);
-C=d(14);
-Kb=d(15);
-Kd=d(16);
+C=d(14)*0.000001;
+Kb=d(15)*0.001;
+Kd=d(16)*1000;
 
 G1=1/R1;
 G2=1/R2;
@@ -53,6 +53,8 @@ G4=1/R4;
 G5=1/R5;
 G6=1/R6;
 G7=1/R7;
+
+syms t
 
 %----------  1  ----------------
 A = [    0   0   1   0   0   0   0   0   0   0   0   0;
@@ -152,7 +154,6 @@ Vd_2 = NC2(11);
 
 
 
-
 Ix = Ib_2 + (V6_2 - V5_2)*G5;
 Req = Vx/Ix;
 tau = Req * C;
@@ -187,7 +188,7 @@ fclose(fid22);
 %------------------------  3  ------------------------
 
 
-syms t
+
 syms v6(t)
 t=0:1e-6:20e-3;
 v6 = (V8_2 + Vx) * exp(-(t/tau));
@@ -197,7 +198,7 @@ plot(t*1000, v6);
 xlabel ("t[ms]");
 ylabel ("V_{6n}(t) [V]");
 print (Teoria_3, "Teoria_3_Fig.eps");
-
+close(Teoria_3);
 
 fid3 = fopen("ngspice_3.txt", "w");
 fprintf(fid3, "Vs V1 0 DC 0\n\ 
@@ -217,7 +218,96 @@ fclose(fid3);
 
 %----------4--------------
 
+f=1000;
+Yc = (C*2*pi*f)*i;
+Zc = 1/Yc;
 
+
+A4 = [-G1 G1+G2+G3 -G2 -G3 0 0 0 0 0 0 0 ;
+        0 -G2-Kb G2 Kb 0 0 0 0 0 0 0 ; 
+        0 Kb 0 -Kb-G5 G5+Yc 0 -Yc 0 0 0 0 ;
+        0 0 0 0 0 G6+G7 -G7 0 0 0 0 ;
+        1 0 0 0 0 0 0 0 0 0 0 ;
+        0 0 0 1 0 Kd*G6 -1 0 0 0 0 ;
+        G1 -G1 0 -G4 0 -G6 0 0 0 0 0];
+
+B4 = [0;0;0;0;1;0;0];
+
+NC4=linsolve(A4,B4);
+
+V1_4 = NC4(1);
+V2_4 = NC4(2);
+V3_4 = NC4(3);
+V5_4 = NC4(4);
+V6_4 = NC4(5);
+V7_4 = NC4(6);
+V8_4 = NC4(7);
+
+
+%Amplitude
+AbsV1=abs(V1_4);
+AbsV2=abs(V2_4);
+AbsV3=abs(V3_4);
+AbsV5=abs(V5_4);
+AbsV6=abs(V6_4);
+AbsV7=abs(V7_4);
+AbsV8=abs(V8_4);
+
+%Argumento de cada no
+ArgV1=arg(V1_4);
+ArgV2=arg(V2_4);
+ArgV3=arg(V3_4);
+ArgV5=arg(V5_4);
+ArgV6=arg(V6_4);
+ArgV7=arg(V7_4);
+ArgV8=arg(V1_4);
+
+
+%----------5------------
+
+t=-5e-3:2e-6:20e-3;
+
+ct=1;
+
+while ct<= length (t) 
+  if t(ct)>=0
+    Plot_V6(ct)= V6_4*sin(2*pi*f*t(ct)) + Vx*exp(-t(ct)/tau);
+    Plot_Vs(ct)= sin(2*pi*f*t(ct));
+ elseif t(ct)<0
+   Plot_V6(ct) = V6;
+   Plot_Vs(ct) = Vs;
+ end
+ ct=ct+1;
+end
+
+ 
+%figura para Teoria 
+Teoria_5 = figure();
+plot(t, Plot_V6, t, Plot_Vs);
+xlabel ("t");
+ylabel ("v_6(t) [V]  e v_s(t) [V]");
+legend("v6","vs");
+print (Teoria_5, "Teoria_5_Fig.eps");
+close(Teoria_5);
+
+
+
+%ficheiro para ngspice
+fid5 = fopen("ngspice_5.txt", "w");
+fprintf(fid5, "Vs V1 0 0.0 ac 1.0 sin(0 1 1k) \n\
+R1 V2 V1 %.11f \n\
+R2 V3 V2 %.11f \n\
+R3 V2 V5 %.11f \n\
+R4 0 V5 %.11f \n\
+R5 V6 V5 %.11f \n\
+R6 V9 V7 %.11f \n\
+R7 V7 V8 %.11f \n\
+VVd 0 V9 0V \n\
+HVd V5 V8 VVd %.11f \n\
+GIb V6 V3 V2 V5 %.11f \n\
+C1 V6 V8 %.11e ic = %.11f \n\
+.ic v(V6) = %.11f v(V8) = 0", R1, R2, R3, R4, R5, R6, R7, Kd, Kb,C,Vx, Vx); 
+fclose(fid5);
 
 
 

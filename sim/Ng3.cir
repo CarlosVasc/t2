@@ -1,4 +1,4 @@
-*Natural Solution of V_6(t)
+*V_6(t)
 .options savecurrents
 
 .include ../doc/ngspice_3.txt
