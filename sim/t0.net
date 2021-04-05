@@ -1,32 +1,23 @@
-*Natural Solution of V_6(t)
+*voltage divider netlist
 .options savecurrents
 
-*.include ../mat/ngspice_circuit_3.txt
-.include ../doc/ngspice_circuit_3.txt
 
+.include ../doc/ngspice_1.tex
+
+.model P2model NPN(Bf=200, CJE=12pF, CJC=2pF)
 .control
 
-
+op
 
 echo "********************************************"
-echo  "Transient analysis"
+echo  "Operating point"
 echo "********************************************"
-tran 1e-5 20e-3 uic
 
-*makes plots in color
-set hcopypscolor=0
-set color0=white
-set color1=black
-set color2=red
-set color3=blue
-set color4=violet
-set color5=rgb:3/8/0
-set color6=rgb:4/0/0
-
-hardcopy trans3.eps v(V6) 
-
+echo  "op_TAB"
+print all
+echo  "op_END"
 
 quit
-.endc
 
+.endc
 .end

@@ -41,7 +41,7 @@ ngspice2: ngspice2.log
 	
 ngspice2.log: ../sim/Ng2.cir
 	ngspice -b $< -o $@
-
+	
 
 ngspice3.log: ../sim/Ng3.cir
 	ngspice -b $< -o $@
@@ -53,6 +53,9 @@ ngspice4.log: ../sim/Ng4.cir
 #convert libreoffice draw figures to pdf
 %.pdf: %.odg
 	soffice --headless --convert-to pdf $<
+
+
+
 
 clean:
 	@rm -rf *.aux *.bbl *.blg *.glg *.glo *.gls *.ilg *.ist *.lof *.txt

@@ -197,7 +197,7 @@ Teoria_3 = figure ();
 plot(t*1000, v6);
 xlabel ("t[ms]");
 ylabel ("V_{6n}(t) [V]");
-print (Teoria_3, "Teoria_3_Fig.eps");
+print (Teoria_3, "Teoria_3_Fig.eps","-depsc");
 close(Teoria_3);
 
 fid3 = fopen("ngspice_3.txt", "w");
@@ -287,9 +287,8 @@ plot(t, Plot_V6, t, Plot_Vs);
 xlabel ("t");
 ylabel ("v_6(t) [V]  e v_s(t) [V]");
 legend("v6","vs");
-print (Teoria_5, "Teoria_5_Fig.eps");
+print (Teoria_5, "Teoria_5_Fig.eps","-depsc");
 close(Teoria_5);
-
 
 
 %ficheiro para ngspice
